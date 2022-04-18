@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <main class="main">
+      <form onsubmit="handleOnSubmit(event)">
+        <section>
+          <label for="name">Name</label>
+          <input id="name" type="text" />
+        </section>
+        <section>
+          <label for="email">Email</label>
+          <input id="email" type="email" />
+        </section>
+        <section>
+          <button>Cadastrar</button>
+        </section>
+      </form>
+      <section id="list-user"></section>
+    </main>
+  </body>
+
+  <script>
+    async function handleOnSubmit(e) {
+      e.preventDefault();
+
+      try {
+        const data = {
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+        };
+
+        if (!data.name || !data.email) {
+          alert("Dados invalidos");
+          return;
+        }
+
+        const { users } = await AjaxRequest({ uri: "/save", arg: data, method: "POST" });
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+
+        const list = document.getElementById("list-user");
+        list.innerHTML = "";
+
+        const container = document.createElement("div");
+        container.setAttribute("class", "container");
+
+        const span_name = document.createElement("span");
+        span_name.innerText = users.name.toUpperCase();
+
+        const span_email = document.createElement("span");
+        span_email.innerText = users.email.toUpperCase();
+
+        container.appendChild(span_name);
+        container.appendChild(span_email);
+        list.appendChild(container);
+      } catch (error) {
+        alert(error);
+      }
+    }
+
+    async function AjaxRequest({ uri, arg = null, method = "GET" }) {
+      return await $.ajax({
+        url: uri,
+        method,
+        data: arg,
+        dataType: "JSON",
+      });
+    }
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .main {
+      display: flex;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .main form {
+      padding: 20px;
+    }
+
+    .main > section {
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+    }
+
+    .container > span {
+      margin: 5px;
+    }
+  </style>
+</html>
